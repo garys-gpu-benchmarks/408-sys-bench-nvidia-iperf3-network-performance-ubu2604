@@ -102,17 +102,17 @@
   {
     "field_name": "run_benchmark Command Plus Options for Smoke Run",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "bash run_benchmark.sh --smoke --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 10G --omit-initial-seconds 0 --interval 1 --time 2"
+    "value": "bash run_benchmark.sh --smoke --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 0 --omit-initial-seconds 0 --interval 1 --time 2"
   },
   {
     "field_name": "run_benchmark Command Plus Options for Baseline Run",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "bash run_benchmark.sh --baseline --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 10G --omit-initial-seconds 1 --interval 1 --time 100"
+    "value": "bash run_benchmark.sh --baseline --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 0 --omit-initial-seconds 1 --interval 1 --time 100"
   },
   {
     "field_name": "run_benchmark Command Plus Options for Extended Run",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "bash run_benchmark.sh --extended --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 10G --omit-initial-seconds 1 --interval 1 --time 290"
+    "value": "bash run_benchmark.sh --extended --validate --protocol tcp,udp --port 5201 --reverse-mode false --window-size 256K --buffer-length 128K --parallel-streams 1 --bandwidth-limit 0 --omit-initial-seconds 1 --interval 1 --time 290"
   },
   {
     "field_name": "Output Fields / Metrics to Parse",
@@ -407,7 +407,7 @@
   {
     "field_name": "Profile Parameter Values",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Parameters_SmokeBaselineExtend",
-    "value": "{\"protocol\": {\"smoke\": \"tcp,udp\", \"baseline\": \"tcp,udp\", \"extended\": \"tcp,udp\", \"notes\": \"Sweep/list value. Command column documents it; omit this flag so yaml expands cases.\"}, \"port\": {\"smoke\": \"5201\", \"baseline\": \"5201\", \"extended\": \"5201\", \"notes\": \"\"}, \"reverse_mode\": {\"smoke\": \"false\", \"baseline\": \"false\", \"extended\": \"false\", \"notes\": \"\"}, \"window_size\": {\"smoke\": \"256K\", \"baseline\": \"256K\", \"extended\": \"256K\", \"notes\": \"\"}, \"buffer_length\": {\"smoke\": \"128K\", \"baseline\": \"128K\", \"extended\": \"128K\", \"notes\": \"\"}, \"parallel_streams\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"bandwidth_limit\": {\"smoke\": \"10G\", \"baseline\": \"10G\", \"extended\": \"10G\", \"notes\": \"\"}, \"omit_initial_seconds\": {\"smoke\": \"0\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"interval\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"time\": {\"smoke\": \"2\", \"baseline\": \"100\", \"extended\": \"290\", \"notes\": \"H100 2026-08-16 time=210 -> 212s (3:32); UDP near-instant on loopback so TCP dominates. Extended 590 extrapolated ~9:55, not tested. Copied AMD 108 wall-clock time. Retimed 2026-08-17 toward 3-4 min baseline; extended scaled by the same factor.\"}}"
+    "value": "{\"protocol\": {\"smoke\": \"tcp,udp\", \"baseline\": \"tcp,udp\", \"extended\": \"tcp,udp\", \"notes\": \"Sweep/list value. Command column documents it; omit this flag so yaml expands cases.\"}, \"port\": {\"smoke\": \"5201\", \"baseline\": \"5201\", \"extended\": \"5201\", \"notes\": \"\"}, \"reverse_mode\": {\"smoke\": \"false\", \"baseline\": \"false\", \"extended\": \"false\", \"notes\": \"\"}, \"window_size\": {\"smoke\": \"256K\", \"baseline\": \"256K\", \"extended\": \"256K\", \"notes\": \"\"}, \"buffer_length\": {\"smoke\": \"128K\", \"baseline\": \"128K\", \"extended\": \"128K\", \"notes\": \"\"}, \"parallel_streams\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"bandwidth_limit\": {\"smoke\": \"0\", \"baseline\": \"0\", \"extended\": \"0\", \"notes\": \"2026-10-19 metric review: bandwidth_limit 10G -> 0 (iperf3 unlimited). With the 10G cap, udp_throughput_gbps reported the cap (9.99 Gbit/s on every profile on MI300X hosts, while TCP loopback reached 55 Gbit/s). Packet loss is now measured at the unlimited send rate, so expect it to be higher than with the cap.\"}, \"omit_initial_seconds\": {\"smoke\": \"0\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"interval\": {\"smoke\": \"1\", \"baseline\": \"1\", \"extended\": \"1\", \"notes\": \"\"}, \"time\": {\"smoke\": \"2\", \"baseline\": \"100\", \"extended\": \"290\", \"notes\": \"H100 2026-08-16 time=210 -> 212s (3:32); UDP near-instant on loopback so TCP dominates. Extended 590 extrapolated ~9:55, not tested. Copied AMD 108 wall-clock time. Retimed 2026-08-17 toward 3-4 min baseline; extended scaled by the same factor.\"}}"
   },
   {
     "field_name": "Profile Command Authorship",

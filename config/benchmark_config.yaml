@@ -14,7 +14,7 @@ sweep:
   window_size: 256K
   buffer_length: 128K
   parallel_streams: 1
-  bandwidth_limit: 10G
+  bandwidth_limit: 0
   omit_initial_seconds:
     smoke: 0
     baseline: 1
