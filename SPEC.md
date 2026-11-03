@@ -16,7 +16,6 @@ Runs iperf3 -J client tests for each yaml protocol. Default peer is 127.0.0.1 (l
 | parallel_streams | `--parallel-streams` | smoke=1, baseline=1, extended=1 | 1 | From Parameter list; see Execution Description With Parameters. |
 | bandwidth_limit | `--bandwidth-limit` | smoke=0, baseline=0, extended=0 | 0 | From Parameter list; see Execution Description With Parameters. |
 | omit_initial_seconds | `--omit-initial-seconds` | smoke=0, baseline=1, extended=1 | 1 | From Parameter list; see Execution Description With Parameters. |
-| interval | `--interval` | smoke=1, baseline=1, extended=1 | 1 | From Parameter list; see Execution Description With Parameters. |
 | time | `--time` | smoke=2, baseline=100, extended=290 | 100 | From Parameter list; see Execution Description With Parameters. |
 
 ## Invocation

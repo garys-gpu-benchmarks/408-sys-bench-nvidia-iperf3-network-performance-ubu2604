@@ -53,7 +53,6 @@ Workload options:
   --parallel-streams <value>            Override parallel_streams
   --bandwidth-limit <value>            Override bandwidth_limit
   --omit-initial-seconds <value>            Override omit_initial_seconds
-  --interval <value>            Override interval
   --time <value>            Override time
 
 Information:
@@ -96,7 +95,6 @@ BUFFER_LENGTH=""
 PARALLEL_STREAMS=""
 BANDWIDTH_LIMIT=""
 OMIT_INITIAL_SECONDS=""
-INTERVAL=""
 TIME=""
 
 while [[ $# -gt 0 ]]; do
@@ -126,7 +124,6 @@ while [[ $# -gt 0 ]]; do
     --parallel-streams) PARALLEL_STREAMS="${2:-}"; shift 2 ;;
     --bandwidth-limit) BANDWIDTH_LIMIT="${2:-}"; shift 2 ;;
     --omit-initial-seconds) OMIT_INITIAL_SECONDS="${2:-}"; shift 2 ;;
-    --interval) INTERVAL="${2:-}"; shift 2 ;;
     --time) TIME="${2:-}"; shift 2 ;;
     --help|--specification|--matrix-definition) shift ;;
     *) die "Unknown option: $1" ;;
@@ -174,7 +171,6 @@ BUFFER_LENGTH="${BUFFER_LENGTH:-$(yaml_get buffer_length)}"
 PARALLEL_STREAMS="${PARALLEL_STREAMS:-$(yaml_get parallel_streams)}"
 BANDWIDTH_LIMIT="${BANDWIDTH_LIMIT:-$(yaml_get bandwidth_limit)}"
 OMIT_INITIAL_SECONDS="${OMIT_INITIAL_SECONDS:-$(yaml_get omit_initial_seconds)}"
-INTERVAL="${INTERVAL:-$(yaml_get interval)}"
 TIME="${TIME:-$(yaml_get time)}"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-$(yaml_get output_format)}"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-csv}"
@@ -189,7 +185,6 @@ BENCHMARK_RUN_COMMAND="bash run_benchmark.sh --${PROFILE}"
 [[ -n "${PARALLEL_STREAMS}" ]] && BENCHMARK_RUN_COMMAND+=" --parallel-streams $(printf %q "${PARALLEL_STREAMS}")"
 [[ -n "${BANDWIDTH_LIMIT}" ]] && BENCHMARK_RUN_COMMAND+=" --bandwidth-limit $(printf %q "${BANDWIDTH_LIMIT}")"
 [[ -n "${OMIT_INITIAL_SECONDS}" ]] && BENCHMARK_RUN_COMMAND+=" --omit-initial-seconds $(printf %q "${OMIT_INITIAL_SECONDS}")"
-[[ -n "${INTERVAL}" ]] && BENCHMARK_RUN_COMMAND+=" --interval $(printf %q "${INTERVAL}")"
 [[ -n "${TIME}" ]] && BENCHMARK_RUN_COMMAND+=" --time $(printf %q "${TIME}")"
 set_benchmark_run_command "${BENCHMARK_RUN_COMMAND}"
 
@@ -241,7 +236,6 @@ run_collection() {
   grep -q -- '--parallel-streams' <<<"${help}" && collect_args+=(--parallel-streams "${PARALLEL_STREAMS}")
   grep -q -- '--bandwidth-limit' <<<"${help}" && collect_args+=(--bandwidth-limit "${BANDWIDTH_LIMIT}")
   grep -q -- '--omit-initial-seconds' <<<"${help}" && collect_args+=(--omit-initial-seconds "${OMIT_INITIAL_SECONDS}")
-  grep -q -- '--interval' <<<"${help}" && collect_args+=(--interval "${INTERVAL}")
   grep -q -- '--time' <<<"${help}" && collect_args+=(--time "${TIME}")
 
   printf -v collect_cmd '%q ' "${PYTHON_BIN}" scripts/collect_workload.py "${collect_args[@]}"

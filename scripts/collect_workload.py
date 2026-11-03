@@ -8,6 +8,7 @@ import csv
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -31,6 +32,29 @@ def as_list(value):
 # throughput metric report the cap: 9.99 Gbit/s on every profile while TCP on
 # the same loopback reached 55 Gbit/s.
 DEFAULT_UDP_RATE = "0"
+
+
+# iperf3 3.20 (Ubuntu 26.04) rejects a UDP -l above the 65507-byte payload limit.
+# buffer_length stays the workbook value for TCP; UDP is clamped to that limit.
+UDP_MAX_BLOCK_BYTES = 65507
+
+
+def block_bytes(length: str) -> int | None:
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)([KMGkmg])?", str(length or "").strip())
+    if not match:
+        return None
+    scale = {"": 1, "K": 1024, "M": 1024 ** 2, "G": 1024 ** 3}[(match.group(2) or "").upper()]
+    return int(float(match.group(1)) * scale)
+
+
+def length_for_protocol(protocol: str, length: str) -> str:
+    text = str(length or "").strip()
+    if protocol != "udp" or not text:
+        return text
+    nbytes = block_bytes(text)
+    if nbytes is not None and nbytes > UDP_MAX_BLOCK_BYTES:
+        return str(UDP_MAX_BLOCK_BYTES)
+    return text
 
 
 def udp_rate(raw) -> str:
@@ -77,7 +101,7 @@ def _stop(proc: subprocess.Popen | None) -> None:
         proc.kill()
 
 
-def iperf(protocol: str, port: int, seconds: int, streams: int, reverse, bandwidth: str, peer: str):
+def iperf(protocol: str, port: int, seconds: int, streams: int, reverse, bandwidth: str, peer: str, length: str = "", window: str = "", omit: str = "0"):
     last_error = ""
     budget = client_timeout(seconds)
     for candidate in (port, port + 1, port + 2):
@@ -99,6 +123,17 @@ def iperf(protocol: str, port: int, seconds: int, streams: int, reverse, bandwid
         ]
         if protocol == "udp":
             cmd += ["-u", "-b", bandwidth]
+        block = length_for_protocol(protocol, length)
+        if block:
+            cmd += ["-l", block]
+        if str(window).strip():
+            cmd += ["-w", str(window).strip()]
+        try:
+            omit_s = int(float(omit or 0))
+        except (TypeError, ValueError):
+            omit_s = 0
+        if omit_s > 0:
+            cmd += ["-O", str(omit_s)]
         if str(reverse).lower() in {"true", "1", "yes"}:
             cmd.append("-R")
         try:
@@ -145,6 +180,9 @@ def main() -> int:
     protocols = as_list(pv(params, "protocol", args.profile, "tcp,udp"))
     bandwidth = udp_rate(pv(params, "bandwidth_limit", args.profile, pv(params, "bandwidth", args.profile, "")))
     peer = os.environ.get("BENCHMARK_IPERF_PEER", "127.0.0.1")
+    length = str(pv(params, "buffer_length", args.profile, "") or "")
+    window = str(pv(params, "window_size", args.profile, "") or "")
+    omit = str(pv(params, "omit_initial_seconds", args.profile, "0") or "0")
     Path(args.run_dir).mkdir(parents=True, exist_ok=True)
     header = [
         "sample_index", "status", "protocol", "iperf_endpoint", "parallel_streams",
@@ -153,7 +191,7 @@ def main() -> int:
     ]
     rows = []
     for proto in protocols or ["tcp"]:
-        bits, jitter, lost, retr, error = iperf(proto.lower(), port, seconds, streams, reverse, bandwidth, peer)
+        bits, jitter, lost, retr, error = iperf(proto.lower(), port, seconds, streams, reverse, bandwidth, peer, length, window, omit)
         if bits <= 0:
             raise SystemExit(f"[FAIL] iperf3 {proto} produced no throughput: {error}")
         rows.append({

@@ -19,7 +19,6 @@ sweep:
     smoke: 0
     baseline: 1
     extended: 1
-  interval: 1
   time:
     smoke: 2
     baseline: 100
