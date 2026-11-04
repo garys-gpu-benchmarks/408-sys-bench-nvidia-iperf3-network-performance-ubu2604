@@ -25,6 +25,11 @@
     "value": "sys-bench-nvidia-iperf3-network-performance-ubu2604"
   },
   {
+    "field_name": "Repo Directory Name",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "408-sys-bench-nvidia-iperf3-network-performance-ubu2604"
+  },
+  {
     "field_name": "Main Goal",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "Measure TCP/UDP iperf3 throughput and stability"
