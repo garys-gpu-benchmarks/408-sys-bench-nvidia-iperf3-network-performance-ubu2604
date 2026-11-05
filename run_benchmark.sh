@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # File: run_benchmark.sh
 # Description: Runs iperf3 -J client tests for each yaml protocol.
-# Execution: bash run_benchmark.sh [--profile smoke|baseline|extended] [--validate]
-# Options: --profile, --smoke, --baseline, --extended, --device, --phase, --raw-file, --config, --validate, --help
+# Execution: bash run_benchmark.sh [--smoke|--baseline|--extended] [--validate]
+# Options: --smoke, --baseline, --extended, --config, --validate, --help
 # Requirements: bash, python3, repository-local .venv
 # Dependencies: common.sh, collect_workload.py
 # License: Apache-2.0
@@ -21,19 +21,11 @@ Usage: bash run_benchmark.sh [OPTIONS]
 Runs iperf3 -J client tests for each yaml protocol.
 
 Profiles:
-  --profile <name>              Run profile: smoke|baseline|extended (default: smoke)
   --smoke                       Run smoke profile
   --baseline                    Run baseline profile
   --extended                    Run extended profile
 
 Execution:
-  --device <gpu|cpu>            Execution device (default: gpu)
-  --phase <phaseN|N>            Run one phase (phase1|phase2|phase3|phase4, or 1-4)
-  --phase1                      Collection
-  --phase2                      Collection alias
-  --phase3                      Parse only; requires --raw-file <path>
-  --phase4                      Validation only
-  --raw-file <path>             Existing raw file for --phase3
   --config <file>               Config file (default: config/benchmark_config.yaml)
 
 Validation and logging:
@@ -41,36 +33,33 @@ Validation and logging:
   --no-validate                 Skip result validation
   --quiet                       Suppress nonessential stdout
   --log-level <level>           ERROR|WARN|INFO|DEBUG (default: INFO)
-  --output-format <fmt>         Override config output_format
-  --save-options-file <path>    Write resolved CLI options to PATH
 
 Workload options:
-  --protocol <value>            Override protocol
-  --port <value>            Override port
-  --reverse-mode <value>            Override reverse_mode
-  --window-size <value>            Override window_size
-  --buffer-length <value>            Override buffer_length
-  --parallel-streams <value>            Override parallel_streams
-  --bandwidth-limit <value>            Override bandwidth_limit
-  --omit-initial-seconds <value>            Override omit_initial_seconds
-  --time <value>            Override time
+  --protocol <value>            Shared workload parameter (smoke/baseline/extended: tcp,udp)
+  --port <value>                Shared workload parameter (smoke/baseline/extended: 5201)
+  --reverse-mode <value>        Shared workload parameter (smoke/baseline/extended: false)
+  --window-size <value>         Shared workload parameter (smoke/baseline/extended: 256K)
+  --buffer-length <value>       Shared workload parameter (smoke/baseline/extended: 128K)
+  --parallel-streams <value>    Shared workload parameter (smoke/baseline/extended: 1)
+  --bandwidth-limit <value>     Shared workload parameter (smoke/baseline/extended: 0)
+  --omit-initial-seconds <value>  Shared workload parameter (smoke 0, baseline 1, extended 1)
+  --time <value>                Shared workload parameter (smoke 2, baseline 100, extended 290)
 
 Information:
   --specification               Print this workload's specification and exit
-  --matrix-definition           Same as --specification
   --help                        Show this help and exit
 
 Examples:
-  bash run_benchmark.sh --profile smoke --validate
-  bash run_benchmark.sh --baseline --device gpu
-  bash run_benchmark.sh --phase3 --raw-file results/raw/<run>/raw_output.txt
+  bash run_benchmark.sh --smoke --validate
+  bash run_benchmark.sh --baseline --validate
+  bash run_benchmark.sh --extended --validate
 USAGE
 }
 
 for _help_arg in "$@"; do
   case "${_help_arg}" in
     --help) usage; exit 0 ;;
-    --specification|--matrix-definition)
+    --specification)
       python3 scripts/print_benchmark_definition.py
       exit 0
       ;;
@@ -78,15 +67,10 @@ for _help_arg in "$@"; do
 done
 
 PROFILE="smoke"
-DEVICE="gpu"
-PHASE="all"
-RAW_FILE=""
 CONFIG_FILE="config/benchmark_config.yaml"
 VALIDATE=1
 QUIET=0
 LOG_LEVEL_VALUE="INFO"
-OUTPUT_FORMAT=""
-SAVE_OPTIONS_FILE=""
 PROTOCOL=""
 PORT=""
 REVERSE_MODE=""
@@ -99,23 +83,14 @@ TIME=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --profile) PROFILE="${2:-}"; shift 2 ;;
     --smoke) PROFILE="smoke"; shift ;;
     --baseline) PROFILE="baseline"; shift ;;
     --extended) PROFILE="extended"; shift ;;
-    --device) DEVICE="${2:-}"; shift 2 ;;
-    --phase) PHASE="${2:-}"; shift 2 ;;
-    --phase1|--phase2) PHASE="1"; shift ;;
-    --phase3) PHASE="3"; shift ;;
-    --phase4) PHASE="4"; shift ;;
-    --raw-file) RAW_FILE="${2:-}"; shift 2 ;;
     --config) CONFIG_FILE="${2:-}"; shift 2 ;;
     --validate) VALIDATE=1; shift ;;
     --no-validate) VALIDATE=0; shift ;;
     --quiet) QUIET=1; shift ;;
     --log-level) LOG_LEVEL_VALUE="${2:-}"; shift 2 ;;
-    --output-format) OUTPUT_FORMAT="${2:-}"; shift 2 ;;
-    --save-options-file) SAVE_OPTIONS_FILE="${2:-}"; shift 2 ;;
     --protocol) PROTOCOL="${2:-}"; shift 2 ;;
     --port) PORT="${2:-}"; shift 2 ;;
     --reverse-mode) REVERSE_MODE="${2:-}"; shift 2 ;;
@@ -125,22 +100,15 @@ while [[ $# -gt 0 ]]; do
     --bandwidth-limit) BANDWIDTH_LIMIT="${2:-}"; shift 2 ;;
     --omit-initial-seconds) OMIT_INITIAL_SECONDS="${2:-}"; shift 2 ;;
     --time) TIME="${2:-}"; shift 2 ;;
-    --help|--specification|--matrix-definition) shift ;;
+    --help|--specification) shift ;;
     *) die "Unknown option: $1" ;;
   esac
 done
 
-case "${PHASE}" in
-  all|phase1|phase2|phase3|phase4|1|2|3|4) ;;
-  *) die "Unsupported --phase value: ${PHASE}" ;;
-esac
-if [[ "${PHASE}" == phase* ]]; then PHASE="${PHASE#phase}"; fi
 
 set_log_level "${LOG_LEVEL_VALUE}"
 begin_benchmark_run "${PROFILE}"
-if [[ "${PHASE}" != "3" && "${PHASE}" != "4" ]]; then
-  bash scripts/ensure_setup.sh
-fi
+bash scripts/ensure_setup.sh
 mark_benchmark_measure_start
 PYTHON_BIN="${REPO_ROOT}/.venv/bin/python"
 [[ -x "${PYTHON_BIN}" ]] || die "Missing ${PYTHON_BIN}; run bash setup.sh --assume-yes first."
@@ -172,7 +140,7 @@ PARALLEL_STREAMS="${PARALLEL_STREAMS:-$(yaml_get parallel_streams)}"
 BANDWIDTH_LIMIT="${BANDWIDTH_LIMIT:-$(yaml_get bandwidth_limit)}"
 OMIT_INITIAL_SECONDS="${OMIT_INITIAL_SECONDS:-$(yaml_get omit_initial_seconds)}"
 TIME="${TIME:-$(yaml_get time)}"
-OUTPUT_FORMAT="${OUTPUT_FORMAT:-$(yaml_get output_format)}"
+OUTPUT_FORMAT="$(yaml_get output_format)"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-csv}"
 
 BENCHMARK_RUN_COMMAND="bash run_benchmark.sh --${PROFILE}"
@@ -190,19 +158,14 @@ set_benchmark_run_command "${BENCHMARK_RUN_COMMAND}"
 
 HOSTNAME_VALUE="$(hostname -s 2>/dev/null || hostname)"
 STAMP="$(date -u +"%Y%m%d_%H%M%S")"
-if [[ -z "${RAW_FILE}" ]]; then
-  RUN_DIR="${REPO_ROOT}/results/raw/${STAMP}_${REPO_NAME}_${HOSTNAME_VALUE}"
-  mkdir -p "${RUN_DIR}"
-  RAW_FILE="${RUN_DIR}/raw_output.txt"
-else
-  RUN_DIR="$(cd "$(dirname "${RAW_FILE}")" && pwd)"
-fi
+RUN_DIR="${REPO_ROOT}/results/raw/${STAMP}_${REPO_NAME}_${HOSTNAME_VALUE}"
+mkdir -p "${RUN_DIR}"
+RAW_FILE="${RUN_DIR}/raw_output.txt"
 set_benchmark_run_dir "${RUN_DIR}"
 COMMAND_LOG="${RUN_DIR}/commands_executed.sh"
 { echo "#!/usr/bin/env bash"; echo "set -euo pipefail"; } > "${COMMAND_LOG}"
 chmod +x "${COMMAND_LOG}"
-[[ -n "${SAVE_OPTIONS_FILE}" ]] && printf 'profile=%s\noutput_format=%s\n' "${PROFILE}" "${OUTPUT_FORMAT}" > "${SAVE_OPTIONS_FILE}"
-printf 'profile=%s\ndevice=%s\noutput_format=%s\n' "${PROFILE}" "${DEVICE}" "${OUTPUT_FORMAT}" > "${RUN_DIR}/cli_options.env"
+printf 'profile=%s\noutput_format=%s\n' "${PROFILE}" "${OUTPUT_FORMAT}" > "${RUN_DIR}/cli_options.env"
 export PYTHONUNBUFFERED=1
 export PATH="/opt/rocm/bin:${PATH}"
 export LD_LIBRARY_PATH="/opt/rocm/lib:/opt/rocm/lib64:${LD_LIBRARY_PATH:-}"
@@ -216,17 +179,6 @@ run_collection() {
   local -a collect_args=(--run-dir "${RUN_DIR}" --raw-file "${RAW_FILE}" --profile "${PROFILE}")
   help="$("${PYTHON_BIN}" scripts/collect_workload.py --help 2>&1 || true)"
   grep -q -- '--config' <<<"${help}" && collect_args+=(--config "${CONFIG_FILE}")
-  # A substring grep for '--device' also matches '--device-id' (it's a
-  # prefix), which made the harness pass the literal word "gpu"/"cpu" as
-  # --device onto a collector that only defines --device-id; argparse then
-  # prefix-matched it and int("gpu") crashed before any RESULT/CSV line.
-  # Require a standalone --device flag, and fall back to --device-id with a
-  # numeric index when only that flag exists.
-  if grep -qE -- '(^|[^-])--device([[:space:],]|$)' <<<"${help}"; then
-    collect_args+=(--device "${DEVICE}")
-  elif grep -qE -- '(^|[^-])--device-id([[:space:],]|$)' <<<"${help}"; then
-    collect_args+=(--device-id "${DEVICE_ID:-0}")
-  fi
   grep -q -- '--output-format' <<<"${help}" && collect_args+=(--output-format "${OUTPUT_FORMAT}")
   grep -q -- '--protocol' <<<"${help}" && collect_args+=(--protocol "${PROTOCOL}")
   grep -q -- '--port' <<<"${help}" && collect_args+=(--port "${PORT}")
@@ -268,11 +220,9 @@ run_validate() {
   "${PYTHON_BIN}" scripts/validate_results.py --db "${REPO_ROOT}/results/benchmark.db" --config "${CONFIG_FILE}" || die "validation failed"
 }
 
-case "${PHASE}" in
-  all|1|2) run_collection; run_parse; [[ "${VALIDATE}" -eq 1 ]] && run_validate ;;
-  3) [[ -n "${RAW_FILE}" && -f "${RAW_FILE}" ]] || die "--phase3 requires --raw-file <existing file>"; run_parse ;;
-  4) run_validate ;;
-esac
+run_collection
+run_parse
+[[ "${VALIDATE}" -eq 1 ]] && run_validate
 record_benchmark_stop
 capture_journal_warnings "${RUN_DIR}" "${BENCHMARK_START_DATETIME}" "${STOP_TIME}"
 bash scripts/collect_hw_sw_info.sh "${RUN_DIR}"
