@@ -21,7 +21,7 @@ Run iperf3 -J for each yaml protocol against 127.0.0.1 unless BENCHMARK_IPERF_PE
 Measure TCP/UDP iperf3 throughput and stability
 
 ## Validation Objective
-Validates that each protocol JSON run completes. Default path is loopback, not VM-to-VM, unless BENCHMARK_IPERF_PEER is set
+Validates each iperf3 JSON run. Loopback is the default unless BENCHMARK_IPERF_PEER is set
 
 ## Workload Category
 Memory, Bandwidth & Data Movement
