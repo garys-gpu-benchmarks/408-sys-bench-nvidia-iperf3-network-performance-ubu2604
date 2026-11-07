@@ -36,7 +36,10 @@ Parameters (override the profile's value):
   --buffer-length <value>       Shared workload parameter (smoke/baseline/extended: 128K)
   --parallel-streams <value>    Shared workload parameter (smoke/baseline/extended: 1)
   --bandwidth-limit <value>     Shared workload parameter (smoke/baseline/extended: 0)
-  --omit-initial-seconds <value>  Shared workload parameter (smoke 0, baseline 1, extended 1)
+  --omit-initial-seconds <value>
+                                Shared workload parameter
+                                  smoke:             0
+                                  baseline/extended: 1
   --time <value>                Shared workload parameter (smoke 2, baseline 100, extended 290)
 
 General options:
