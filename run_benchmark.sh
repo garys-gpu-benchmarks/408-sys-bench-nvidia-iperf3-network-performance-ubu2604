@@ -16,12 +16,11 @@ capture_benchmark_run_command_submitted "$@"
 
 usage() {
   cat <<'USAGE'
+
 Usage: bash run_benchmark.sh [OPTIONS]
 
 Workload Name:          iPerf3 TCP/UDP Sweep.
 Main Goal:              Measure TCP/UDP iperf3 throughput and stability.
-Validation Objective:   Validates each iperf3 JSON run. Loopback is the default unless
-                        BENCHMARK_IPERF_PEER is set.
 Command Tools Executed: Run iperf3 client (-J) and, for loopback, iperf3 -s -1.
 
 Profiles (default: --smoke):
