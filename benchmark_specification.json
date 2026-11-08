@@ -202,17 +202,17 @@
   {
     "field_name": "GPU Model",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "H100 SXM 80GB"
-  },
-  {
-    "field_name": "Raw Output Format",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "iperf3 -J JSON plus one normalized CSV row per protocol. The endpoint column records 127.0.0.1 unless BENCHMARK_IPERF_PEER is set"
+    "value": "--"
   },
   {
     "field_name": "Primary Record Granularity",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "one CSV row per protocol invocation (tcp and udp)"
+  },
+  {
+    "field_name": "Raw Output Format",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "iperf3 -J JSON plus one normalized CSV row per protocol. The endpoint column records 127.0.0.1 unless BENCHMARK_IPERF_PEER is set"
   },
   {
     "field_name": "Raw Output Example",
@@ -225,19 +225,19 @@
     "value": "tcp_loopback_gbps, udp_throughput_gbps, udp_jitter_ms, packet_loss_rate, tcp_retransmit_count, bits_per_second, iperf_endpoint"
   },
   {
-    "field_name": "Success Criteria",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "the client connects and the JSON object contains the expected end summary; failed invocations are retained as error samples"
-  },
-  {
     "field_name": "Parser and Normalization Notes",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "bits_per_second is converted to Gb/s. udp_jitter_ms and packet_loss_rate (iperf3 lost_percent, a percent) are filled on the UDP row only and tcp_retransmit_count on the TCP row only; the other row is blank, so the averages are not diluted by zeros"
   },
   {
+    "field_name": "Success Criteria",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "the client connects and the JSON object contains the expected end summary; failed invocations are retained as error samples"
+  },
+  {
     "field_name": "Hardware Config",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "NVIDIA H100 SXM host (20+ vCPUs, 128+ GB RAM, local NVMe), 1x H100 SXM (80 GB HBM3, sm_90, 132 SMs)"
+    "value": "Cloud GPU host such as a RunPod Pod (20+ vCPUs, 128+ GB RAM, local NVMe), 1x NVIDIA data-center GPU (80+ GB HBM; model varies by provider)"
   },
   {
     "field_name": "GPU Architecture",

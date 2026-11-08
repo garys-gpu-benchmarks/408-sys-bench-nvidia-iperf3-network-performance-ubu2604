@@ -19,9 +19,9 @@ usage() {
 
 Usage: bash run_benchmark.sh [OPTIONS]
 
-Workload Name:          iPerf3 TCP/UDP Sweep.
-Main Goal:              Measure TCP/UDP iperf3 throughput and stability.
-Command Tools Executed: Run iperf3 client (-J) and, for loopback, iperf3 -s -1.
+Workload Name:          iPerf3 TCP/UDP Sweep
+Main Goal:              Measure TCP/UDP iperf3 throughput and stability
+Command Tools Executed: Run iperf3 client (-J) and, for loopback, iperf3 -s -1
 
 Profiles (default: --smoke):
   --smoke                       Run smoke profile
