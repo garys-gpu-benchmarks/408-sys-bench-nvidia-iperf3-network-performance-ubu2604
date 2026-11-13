@@ -40,6 +40,11 @@
     "value": "Run iperf3 client (-J) and, for loopback, iperf3 -s -1"
   },
   {
+    "field_name": "Execution Description With Parameters",
+    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
+    "value": "Runs iperf3 -J client tests for each yaml protocol. Default peer is 127.0.0.1 (loopback); override with BENCHMARK_IPERF_PEER. protocol: tcp and/or udp. parallel_streams: -P. time: -t seconds. port: 5201. A local iperf3 -s -1 server is spawned for loopback. UDP -b is bandwidth_limit (10G when empty or zero). reverse_mode is passed as iperf3 -R when true. window_size, buffer_length, omit_initial_seconds, and interval are yaml fields and are not passed to iperf3"
+  },
+  {
     "field_name": "Metrics",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "#1: TCP loopback throughput (tcp_loopback_gbps); #2: UDP loopback throughput (udp_throughput_gbps); #3: UDP jitter (udp_jitter_ms); #4: Packet loss, percent (packet_loss_rate); #5: TCP retransmit count per run (tcp_retransmit_count)"
@@ -173,11 +178,6 @@
     "field_name": "Command Methodology",
     "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
     "value": "Run iperf3 -J for each yaml protocol against 127.0.0.1 unless BENCHMARK_IPERF_PEER is set, with a one-shot iperf3 -s -1 server on loopback and reverse_mode passed as -R, to measure TCP throughput, UDP jitter, loss, and retransmits. window_size, buffer_length, omit_initial_seconds, and interval are not passed to iperf3"
-  },
-  {
-    "field_name": "Execution Description With Parameters",
-    "source_file": "BenchmarkSpecDefinitions.xlsx::Workload_Definitions",
-    "value": "Runs iperf3 -J client tests for each yaml protocol. Default peer is 127.0.0.1 (loopback); override with BENCHMARK_IPERF_PEER. protocol: tcp and/or udp. parallel_streams: -P. time: -t seconds. port: 5201. A local iperf3 -s -1 server is spawned for loopback. UDP -b is bandwidth_limit (10G when empty or zero). reverse_mode is passed as iperf3 -R when true. window_size, buffer_length, omit_initial_seconds, and interval are yaml fields and are not passed to iperf3"
   },
   {
     "field_name": "Execution Domain",
